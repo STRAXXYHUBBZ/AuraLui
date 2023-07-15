@@ -1,0 +1,249 @@
+getgenv().Get =
+    setmetatable(
+    {},
+    {
+        __index = function(A, B)
+            return game:GetService(B)
+        end
+    }
+)
+repeat wait() until game:IsLoaded()
+local ReplicatedStorage = Get.ReplicatedStorage
+local Players = Get.Players
+local RunService = Get.RunService
+local TweenService = Get.TweenService
+local Workspace = Get.Workspace
+local HttpService = Get.HttpService
+local Player = Players.LocalPlayer
+
+Player.Idled:connect(function()
+    game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+    end)
+    
+    local h = require(ReplicatedStorage.Shared.Modules.DungeonLibrary)
+    
+    local Settings = {}
+    
+    local Dungeons = {}
+    for i, v in pairs(h.Dungeons) do
+        table.insert(Dungeons, i)
+    end
+    GameModes = {}
+    for i, v in pairs(h.GameModes) do
+        table.insert(GameModes, i)
+    end
+    Difficulties = {}
+    for i, v in pairs(h.Difficulties) do
+        table.insert(Difficulties, i)
+    end
+    
+    local function GetClosestt()
+        local TargetDistance = math.huge
+        local Target
+        for i, v in pairs(Workspace:GetChildren()) do
+            if v.ClassName == "Folder" then
+                for i, x in pairs(v:GetChildren()) do
+                    if x.ClassName == "Folder" then
+                        for i, c in pairs(x:GetChildren()) do
+                            if
+                                c.ClassName == "Model" and c:FindFirstChild("EvilHumanoid") and
+                                    c:FindFirstChildOfClass("Humanoid").Health ~= 0 and
+                                    c ~= nil
+                             then
+                                local mag =
+                                    (Player.Character.HumanoidRootPart.Position -
+                                    c.HumanoidRootPart.Position).magnitude
+                                if mag < TargetDistance then
+                                    TargetDistance = mag
+                                    Target = c
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return Target
+    end
+    
+    local Noclip = function(A)
+        return A:ChangeState(11)
+    end 
+    
+    local Tween = function(A,B,C)
+        if A and B and C then
+            return TweenService:Create(A,TweenInfo.new((B.Position + Vector3.new(0,0,-2) - A.Position).magnitude / C, Enum.EasingStyle.Linear),{CFrame = CFrame.new(B.Position + Vector3.new(0,0,-2))}):Play()
+        end 
+    end 
+    local Script = require(Player.PlayerScripts.Shared.Client.CombatController)
+    local ScriptFunction = Script.BasicAttack
+    local ScriptFunction2 = Script.UseAbility
+    
+    speed = 50
+    
+
+
+
+
+
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/STRAXXYHUBBZ/AuraLui/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "Project Aura / v1", HidePremium = false, SaveConfig = true, ConfigFolder = "Project Aura"})
+local Settings = {}
+
+local Tab = Window:MakeTab({
+	Name = "Treasure Quest",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "AutoFarm"
+})
+
+--[[
+Name = <string> - The name of the section.
+]]
+Tab:AddToggle({
+	Name = "Kill Mobs",
+	Default = false,
+	Callback = function(State)
+        game:GetService("RunService").Stepped:connect(
+    function()
+        pcall(
+            function()
+                if State then
+                    ScriptFunction(Script)
+                    ScriptFunction2(Script, GetClosestt().PrimaryPart.Position)
+                    Noclip(Player.Character:WaitForChild("Humanoid"))
+                end
+            end
+        )
+    end
+)
+spawn(function()
+    while wait() and State do 
+        pcall(function()
+            ReplicatedStorage.Dungeon.Remotes.StartDungeon:FireServer()
+            ReplicatedStorage.Dungeon.Remotes.StartDungeon:FireServer()
+            ReplicatedStorage.Dungeon.Remotes.StartWaveDefense:FireServer()
+
+            ReplicatedStorage.Shared.Remotes.Data.ClaimPrizes:FireServer()
+            for i,v in pairs(Workspace:GetChildren()) do
+                if v:FindFirstChild("FinishRoom",true)and v:FindFirstChild("FinishRoom",true):FindFirstChild("Hitbox",true) then
+                    firetouchinterest(Player.Character:FindFirstChild("HumanoidRootPart",true),v:FindFirstChild("FinishRoom",true):FindFirstChild("Hitbox",true):FindFirstChild("Part",true),0)
+                    firetouchinterest(Player.Character:FindFirstChild("HumanoidRootPart",true),v:FindFirstChild("FinishRoom",true):FindFirstChild("Hitbox",true):FindFirstChild("Part",true),1)
+                end 
+            end 
+            if GetClosestt():FindFirstChildWhichIsA("Humanoid",true).Health ~= 0 then
+                Tween(Player.Character:FindFirstChild("HumanoidRootPart",true),GetClosestt().HumanoidRootPart,speed)
+            end 
+       end)
+    end
+end)
+
+
+	end    
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tab:AddToggle({
+	Name = "Collect Medkits",
+	Default = false,
+	Callback = function(Valsue)
+		spawn(function()
+            while wait() and Valsue do
+                pcall(function()
+                    for i,v in pairs(Workspace.Ignore:GetChildren()) do
+                        if v.Name == "Medkit" and v:FindFirstChildWhichIsA("TouchTransmitter",true) then
+                            if Player.Character.Humanoid.Health < Player.Character.Humanoid.MaxHealth then
+                                firetouchinterest(Player.Character:FindFirstChild("HumanoidRootPart",true), v, 0)
+                                firetouchinterest(Player.Character:FindFirstChild("HumanoidRootPart",true), v, 1)
+                            end 
+                        end 
+                    end
+                end)
+            end 
+        end)
+	end    
+})
+
+
+Tab:AddToggle({
+	Name = "Collect Chests/Treasure",
+	Default = false,
+	Callback = function(Valuae)
+		spawn(function()
+            while wait() and Valuae do 
+                pcall(function()
+                    for i,v in pairs(Workspace:GetDescendants()) do
+                        if v.Name == "Chest"  then
+                            firetouchinterest(Player.Character:FindFirstChild("HumanoidRootPart",true),v:FindFirstChild("Hitbox"),0)
+                            firetouchinterest(Player.Character:FindFirstChild("HumanoidRootPart",true),v:FindFirstChild("Hitbox"),1)
+                        end 
+                    end 
+                end)
+            end 
+        end)
+	end    
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tab:AddSlider({
+	Name = "Slider",
+	Min = 0,
+	Max = 95,
+	Default = 45,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 1,
+	ValueName = "Speed",
+	Callback = function(Value)
+		speed = Value
+	end    
+})
